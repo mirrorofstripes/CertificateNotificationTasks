@@ -8,4 +8,6 @@ They will work with certificates autorenewed via Active Directory Certificate Se
 
 If you are using a third-party Certificate Authority e.g. Let's Encrypt you can still use the Certificate Services Lifecycle Notifications feature
 
-Simply run the 'installation' task and use the PowerShell command Switch-Certificate -OldCert <thumbprint> -NewCert <thumbprint> to mark the certificate as 'replaced' and trigger the task - see https://learn.microsoft.com/en-us/powershell/module/pki/switch-certificate?view=windowsserver2022-ps
+To use, review and download both files .ps1 files to a folder, then run Deploy-CertificateRenewalTasks.ps1
+
+Then either perform a certificate autorenewal using ADCS, or when using a third-part Certificate Authority, use the PowerShell command Switch-Certificate -OldCert <thumbprint> -NewCert <thumbprint> to mark the certificate as 'replaced' and trigger the task - see https://learn.microsoft.com/en-us/powershell/module/pki/switch-certificate?view=windowsserver2022-ps
