@@ -110,14 +110,14 @@ if (Test-Path -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SQLServerReportingS
             }
             # If this SQL Server Reporting Services instance is not configured to enforce SSL connections, set this up
             if ($SQLServerRSConfigurationSetting.SecureConnectionLevel -eq 0) {
-                Write-Output "Setting secure connection level for SQL Server Reporting Services to '1'..." | Tee-Object -FilePath $PSScriptOutputLog -Append
+                Write-Output "Setting secure connection level for SQL Server Reporting Services to '1'..."
                 $SQLSetSecureMethodResult = $SQLServerRSConfigurationSetting | Invoke-CimMethod -MethodName SetSecureConnectionLevel -Arguments @{Level=1}
                 if ($SQLSetSecureMethodResult.HRESULT -ne 0) {
                     Write-Error "Error $($SQLSetSecureMethodResult.HRESULT) setting secure connection level for SQL Server Reporting Services: $($SQLSetSecureMethodResult.Error)"
                 }
             }
             # Restart SQL Server Reporting Services instance
-            Write-Output "Restarting SQL Server Reporting Services 'SQLServerReportingServices'..." | Tee-Object -FilePath $PSScriptOutputLog -Append
+            Write-Output "Restarting SQL Server Reporting Services 'SQLServerReportingServices'..."
             Restart-Service -Name 'SQLServerReportingServices' -Force
         }
     }
