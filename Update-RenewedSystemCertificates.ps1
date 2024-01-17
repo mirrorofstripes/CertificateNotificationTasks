@@ -15,7 +15,7 @@ $NewCertificate = Get-Item -Path Cert:\LocalMachine\My\$NewCertHash
 
 # If the new certificate template information shows it is an SQL Server certificate - prevent the incorrect certificate template from being selected when passing NewCertHash only
 if ($NewCertificate.Extensions | Where-Object { $_.Oid.Value -eq '1.3.6.1.4.1.311.21.7' -and $_.Format(0) -match "^Template=SQL Server\(" }) {
-    # Look for any Microsoft SQL Server instances using the old certificate thumbprint
+    # Look for any Microsoft SQL Server Database Engine instances using the old certificate thumbprint
     foreach ($SuperSocketNetLibKey in Get-Item -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL*\MSSQLSERVER\SuperSocketNetLib" | Where-Object { $_.GetValue('Certificate') -eq $OldCertHash }) { # Based on https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-sql-server-encryption?view=sql-server-ver16
         # Get the instance name, service name and account of this SQL Server - based on https://dba.stackexchange.com/questions/56045/any-relation-between-sql-server-service-name-and-instance-name
         $SQLServerRegKey = Get-Item ($SuperSocketNetLibKey | Split-Path | Split-Path)
@@ -41,11 +41,11 @@ if ($NewCertificate.Extensions | Where-Object { $_.Oid.Value -eq '1.3.6.1.4.1.31
     }
 }
 
-# Get this device's Windows system locale for use with SQL Server Reporting Services WMI methods
-$SystemLocale = Get-WinSystemLocale
-
 # If there is an instance of the SQL Server Reporting Services service installed
 if (Test-Path -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SQLServerReportingServices" -PathType Container) {
+    # Get this device's Windows system locale for use with SQL Server Reporting Services WMI methods
+    $SystemLocale = Get-WinSystemLocale
+
     # Look for any SQL Server Reporting Services instances using the old certificate thumbprint - based on https://community.certifytheweb.com/t/sql-server-reporting-services-ssrs/332
     # Also based on https://learn.microsoft.com/en-us/answers/questions/924375/ssrs-pbi-report-server-still-linked-to-old-certifi
     foreach ($SQLServerRSInstance in Get-CimInstance -Namespace root\Microsoft\SqlServer\ReportServer -ClassName __Namespace) {
@@ -108,15 +108,16 @@ if (Test-Path -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SQLServerReportingS
                     }
                 }
             }
-            # Enforce redirecting HTTP sessions to SSL in SQL Server Reporting Services
-            Write-Output "Setting secure connection level for SQL Server Reporting Services to '1'..."
-            $SQLSetSecureMethodResult = $SQLServerRSConfigurationSetting | Invoke-CimMethod -MethodName SetSecureConnectionLevel -Arguments @{Level=1}
-            if ($SQLSetSecureMethodResult.HRESULT -ne 0) {
-                Write-Error "Error $($SQLSetSecureMethodResult.HRESULT) setting secure connection level for SQL Server Reporting Services: $($SQLSetSecureMethodResult.Error)"
+            # If this SQL Server Reporting Services instance is not configured to enforce SSL connections, set this up
+            if ($SQLServerRSConfigurationSetting.SecureConnectionLevel -eq 0) {
+                Write-Output "Setting secure connection level for SQL Server Reporting Services to '1'..." | Tee-Object -FilePath $PSScriptOutputLog -Append
+                $SQLSetSecureMethodResult = $SQLServerRSConfigurationSetting | Invoke-CimMethod -MethodName SetSecureConnectionLevel -Arguments @{Level=1}
+                if ($SQLSetSecureMethodResult.HRESULT -ne 0) {
+                    Write-Error "Error $($SQLSetSecureMethodResult.HRESULT) setting secure connection level for SQL Server Reporting Services: $($SQLSetSecureMethodResult.Error)"
+                }
             }
-
             # Restart SQL Server Reporting Services instance
-            Write-Output "Restarting SQL Server Reporting Services 'SQLServerReportingServices'..."
+            Write-Output "Restarting SQL Server Reporting Services 'SQLServerReportingServices'..." | Tee-Object -FilePath $PSScriptOutputLog -Append
             Restart-Service -Name 'SQLServerReportingServices' -Force
         }
     }
