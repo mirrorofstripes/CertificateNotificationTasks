@@ -1,7 +1,7 @@
 These scripts allow the use of Windows 8+ and Windows Server 2012+ Certificate Services Lifecycle Notifications to automatically deploy new certificates after they are renewed - see https://social.technet.microsoft.com/wiki/contents/articles/14250.certificate-services-lifecycle-notifications.aspx
 
 Supported products:
- - SQL Server Database Services
+ - SQL Server Database Engine
  - SQL Server Reporting Services
 
 They will work with certificates autorenewed via Active Directory Certificate Services if you use the Certificate Template name of 'SQL Server' and 'Internal Web Server' respectively (to use other names, update the script!)
