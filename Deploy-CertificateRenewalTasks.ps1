@@ -14,10 +14,11 @@ if ($null -ne $SQLServerCertificates) {
     }
 
     # If the destination script file does not yet exist, or it has a different length or last write time
-    if (-not (Test-Path -Path "$ScriptDestinationPath\$NotificationScriptFile" -PathType Leaf) -or (Compare-Object -ReferenceObject (Get-Item -Path "$PSScriptRoot\$NotificationScriptFile") -DifferenceObject (Get-Item -Path "$ScriptDestinationPath\$NotificationScriptFile") -Property Length, LastWriteTime)) {
+    if (-not (Test-Path -Path "$ScriptDestinationPath\$NotificationScriptFile" -PathType Leaf) -or (Compare-Object -ReferenceObject (Get-Item -Path "$PSScriptRoot\$NotificationScriptFile") -DifferenceObject (Get-Item -Path "$ScriptDestinationPath\$NotificationScriptFile") -Property Length, LastWriteTimeUtc)) {
         Write-Output "Deploying certificate notification script '$PSScriptRoot\$NotificationScriptFile'..."
         Copy-Item -Path "$PSScriptRoot\$NotificationScriptFile" -Destination $ScriptDestinationPath -Force
         Unblock-File -Path "$ScriptDestinationPath\$NotificationScriptFile" # Unblock the file if it is still marked as downloaded from the Internet
+        (Get-Item -Path "$ScriptDestinationPath\$NotificationScriptFile").LastWriteTimeUtc = (Get-Item -Path "$PSScriptRoot\$NotificationScriptFile").LastWriteTimeUtc # Set the last write time to match the original
 
         if (Get-CertificateNotificationTask | Where-Object { $_.Name -eq $CertificateNotificationTaskName }) { Remove-CertificateNotificationTask -Name $CertificateNotificationTaskName } # If the named certificate notification task already exists, first remove it
         Write-Output "Deploying certificate notification task '$CertificateNotificationTaskName'..."
