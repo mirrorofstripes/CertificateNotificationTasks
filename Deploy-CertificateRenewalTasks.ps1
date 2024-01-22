@@ -13,8 +13,8 @@ if ($null -ne $SQLServerCertificates) {
         New-Item $ScriptDestinationPath -Type Directory | Out-Null
     }
 
-    # If the destination script file does not yet exist, or it has a different length or last write time
-    if (-not (Test-Path -Path "$ScriptDestinationPath\$NotificationScriptFile" -PathType Leaf) -or (Compare-Object -ReferenceObject (Get-Item -Path "$PSScriptRoot\$NotificationScriptFile") -DifferenceObject (Get-Item -Path "$ScriptDestinationPath\$NotificationScriptFile") -Property Length, LastWriteTimeUtc)) {
+    # If the destination script file does not yet exist, or is not up to date
+    if (-not (Test-Path -Path "$ScriptDestinationPath\$NotificationScriptFile" -PathType Leaf) -or (Get-FileHash -Path "$PSScriptRoot\$NotificationScriptFile").Hash -ne (Get-FileHash -Path "$ScriptDestinationPath\$NotificationScriptFile").Hash) {
         Write-Output "Deploying certificate notification script '$ScriptDestinationPath\$NotificationScriptFile'..."
         Copy-Item -Path "$PSScriptRoot\$NotificationScriptFile" -Destination $ScriptDestinationPath -Force
         Unblock-File -Path "$ScriptDestinationPath\$NotificationScriptFile" # Unblock the file if it is still marked as downloaded from the Internet
