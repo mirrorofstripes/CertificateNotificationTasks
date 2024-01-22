@@ -18,7 +18,6 @@ if ($null -ne $SQLServerCertificates) {
         Write-Output "Deploying certificate notification script '$ScriptDestinationPath\$NotificationScriptFile'..."
         Copy-Item -Path "$PSScriptRoot\$NotificationScriptFile" -Destination $ScriptDestinationPath -Force
         Unblock-File -Path "$ScriptDestinationPath\$NotificationScriptFile" # Unblock the file if it is still marked as downloaded from the Internet
-        (Get-Item -Path "$ScriptDestinationPath\$NotificationScriptFile").LastWriteTimeUtc = (Get-Item -Path "$PSScriptRoot\$NotificationScriptFile").LastWriteTimeUtc # Set the last write time to match the original
 
         if (Get-CertificateNotificationTask | Where-Object { $_.Name -eq $CertificateNotificationTaskName }) { Remove-CertificateNotificationTask -Name $CertificateNotificationTaskName } # If the named certificate notification task already exists, first remove it
         Write-Output "Deploying certificate notification task '$CertificateNotificationTaskName'..."
