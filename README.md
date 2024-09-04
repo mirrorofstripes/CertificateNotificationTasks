@@ -1,3 +1,8 @@
+# Modifications done
+- The scripts deploy to C:\_scripts
+- The script looks for a certificate based on a template called "zs-cert-SRV-SQL-Server"
+
+# Original readme.md
 These scripts allow the use of Windows 8+ and Windows Server 2012+ Certificate Services Lifecycle Notifications to automatically deploy new certificates after they are renewed - see https://social.technet.microsoft.com/wiki/contents/articles/14250.certificate-services-lifecycle-notifications.aspx
 
 Supported products:
