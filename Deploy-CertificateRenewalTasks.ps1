@@ -6,7 +6,7 @@ $CertificateNotificationTaskName = "Internal-SystemCertificateRenewalTask"
 $NotificationScriptFile = "Update-RenewedSystemCertificates.ps1"
 $ScriptDestinationPath = "$env:SystemDrive\_scripts"
 
-$SQLServerCertificates = Get-ChildItem Cert:\LocalMachine\My\ | Where-Object { $_.Extensions | Where-Object { $_.Oid.Value -eq '1.3.6.1.4.1.311.21.7' -and $_.Format(0) -match "^Template=SQL Server\(" } }
+$SQLServerCertificates = Get-ChildItem Cert:\LocalMachine\My\ | Where-Object { $_.Extensions | Where-Object { $_.Oid.Value -eq '1.3.6.1.4.1.311.21.7' -and $_.Format(0) -match "^Template=zs-cert-SRV-SQL-Server\(" } }
 
 if ($null -ne $SQLServerCertificates) {
     if (-not (Test-Path -Path $ScriptDestinationPath -PathType Container)) { # Create the destination directory if it does not already exist
