@@ -1,5 +1,5 @@
 # Modifications done
-- The scripts deploy to C:\_scripts
+- The scripts deploy to C:\\_scripts
 - The script looks for a certificate based on a template called "zs-cert-SRV-SQL-Server"
 
 # Original readme.md
